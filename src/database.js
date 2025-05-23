@@ -31,6 +31,22 @@ export const initDb = async () => {
   return initPromise;
 };
 
+export const getPatients = async () => {
+  try {
+    if (!initialized) {
+      await initDb();
+    }
+    if (!db) {
+      throw new Error('Database not initialized');
+    }
+    const result = await db.query('SELECT * FROM patients ORDER BY createdAt DESC');
+    return result.rows || [];
+  } catch (error) {
+    console.error('Error getting patients:', error);
+    return [];
+  }
+};
+
 export const addPatient = async (patient) => {
   try {
     if (!initialized) {

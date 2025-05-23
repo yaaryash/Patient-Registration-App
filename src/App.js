@@ -13,7 +13,8 @@ import {
   Snackbar,
 } from "@mui/material";
 import PatientForm from "./components/PatientForm";
-import { initDb } from "./database";
+import PatientsList from "./components/PatientsList";
+import { initDb, getPatients } from "./database";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -36,14 +37,16 @@ function App() {
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
   const [tabValue, setTabValue] = useState(0);
+  const [patients, setPatients] = useState([]);
 
   useEffect(() => {
     const setupDatabase = async () => {
       try {
         setIsLoading(true);
         setError(null);
-
         await initDb();
+        const initialPatients = await getPatients();
+        setPatients(initialPatients);
       } catch (error) {
         console.error("Error initializing app:", error);
         setError(
@@ -54,20 +57,32 @@ function App() {
         setIsLoading(false);
       }
     };
-
     setupDatabase();
   }, []);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+    if (newValue === 1) {
+      refreshPatients();
+    }
   };
 
-  const handlePatientAdded = (newPatient) => {
+  const handlePatientAdded = async (newPatient) => {
     setNotification("Patient registered successfully");
-
+    await refreshPatients();
+    setTabValue(1); 
     setTimeout(() => {
       setNotification(null);
     }, 3000);
+  };
+
+  const refreshPatients = async () => {
+    try {
+      const updatedPatients = await getPatients();
+      setPatients(updatedPatients);
+    } catch (error) {
+      setError("Failed to refresh patients list");
+    }
   };
 
   const handleCloseNotification = () => {
@@ -125,6 +140,28 @@ function App() {
                 </Alert>
               )}
             </>
+          )}
+        </TabPanel>
+        <TabPanel value={tabValue} index={1}>
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+                flexDirection: "column",
+              }}
+            >
+              <CircularProgress size={60} sx={{ mb: 3 }} />
+              <Typography variant="h6">Loading patients...</Typography>
+            </Box>
+          ) : error ? (
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <Alert severity="error">{error}</Alert>
+            </Box>
+          ) : (
+            <PatientsList patients={patients} />
           )}
         </TabPanel>
       </Container>
