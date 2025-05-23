@@ -1,8 +1,10 @@
 import { PGliteWorker } from '@electric-sql/pglite/worker';
+import { live } from '@electric-sql/pglite/live';
 
 let db = null;
 let initialized = false;
 let initPromise = null;
+let liveQueries = {};
 
 export const initDb = async () => {
   if (initialized) return true;
@@ -15,8 +17,17 @@ export const initDb = async () => {
       db = await PGliteWorker.create(
         new Worker(new URL('./pglite-worker.js', import.meta.url), {
           type: 'module'
-        })
+        }),
+        {
+          extensions: {
+            live
+          }
+        }
       );
+
+      db.onLeaderChange(() => {
+        console.log('PGlite worker leadership changed, current tab isLeader:', db.isLeader);
+      });
       
       initialized = true;
       return true;
@@ -74,7 +85,7 @@ export const addPatient = async (patient) => {
       newPatient.age,
       newPatient.createdAt
     ]);
-
+    
     return newPatient;
   } catch (error) {
     console.error('Error adding patient:', error);
@@ -96,4 +107,38 @@ export const executeSqlQuery = async (sql) => {
     console.error('Error executing SQL query:', error);
     throw error;
   }
-}; 
+};
+
+export const createLivePatientQuery = async (callback) => {
+  try {
+    if (!initialized) {
+      await initDb();
+    }
+    
+    if (!db || !db.live) {
+      throw new Error('Database or live query extension not initialized');
+    }
+    const queryId = 'patients-' + Date.now();
+    
+    const liveQuery = await db.live.query(
+      'SELECT * FROM patients ORDER BY createdAt DESC',
+      [],
+      (result) => {
+        console.log('Live query update received:', result);
+        if (callback && typeof callback === 'function') {
+          callback(result.rows || []);
+        }
+      }
+    );
+
+    liveQueries[queryId] = liveQuery;
+
+    return {
+      ...liveQuery,
+      queryId
+    };
+  } catch (error) {
+    console.error('Error creating live query:', error);
+    throw error;
+  }
+};

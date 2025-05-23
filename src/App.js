@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Container,
   CssBaseline,
@@ -15,7 +15,12 @@ import {
 import PatientForm from "./components/PatientForm";
 import PatientsList from "./components/PatientsList";
 import SQLQueryPanel from "./components/SQLQueryPanel";
-import { initDb, getPatients, executeSqlQuery } from "./database";
+import {
+  initDb,
+  getPatients,
+  executeSqlQuery,
+  createLivePatientQuery,
+} from "./database";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -40,24 +45,43 @@ function App() {
   const [tabValue, setTabValue] = useState(0);
   const [patients, setPatients] = useState([]);
 
-  useEffect(() => {
-    const setupDatabase = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        await initDb();
-        const initialPatients = await getPatients();
-        setPatients(initialPatients);
-      } catch (error) {
-        console.error("Error initializing app:", error);
-        setError(
-          "Failed to initialize the database: " +
-            (error.message || "Unknown error")
+  const liveQueryRef = useRef(null);
+
+  const setupDatabase = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      await initDb();
+
+      const initialPatients = await getPatients();
+      setPatients(initialPatients);
+
+      const liveQuery = await createLivePatientQuery((updatedPatients) => {
+        console.log(
+          "Live query update received, patients:",
+          updatedPatients.length
         );
-      } finally {
-        setIsLoading(false);
-      }
-    };
+
+        setPatients(updatedPatients);
+
+        if (initialPatients.length !== updatedPatients.length) {
+          setNotification("Patient data updated");
+        }
+      });
+
+      liveQueryRef.current = liveQuery;
+    } catch (error) {
+      console.error("Error initializing app:", error);
+      setError(
+        "Failed to initialize the database: " +
+          (error.message || "Unknown error")
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     setupDatabase();
   }, []);
 
