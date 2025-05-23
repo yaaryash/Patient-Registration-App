@@ -14,7 +14,8 @@ import {
 } from "@mui/material";
 import PatientForm from "./components/PatientForm";
 import PatientsList from "./components/PatientsList";
-import { initDb, getPatients } from "./database";
+import SQLQueryPanel from "./components/SQLQueryPanel";
+import { initDb, getPatients, executeSqlQuery } from "./database";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -70,7 +71,7 @@ function App() {
   const handlePatientAdded = async (newPatient) => {
     setNotification("Patient registered successfully");
     await refreshPatients();
-    setTabValue(1); 
+    setTabValue(1);
     setTimeout(() => {
       setNotification(null);
     }, 3000);
@@ -163,6 +164,9 @@ function App() {
           ) : (
             <PatientsList patients={patients} />
           )}
+        </TabPanel>
+        <TabPanel value={tabValue} index={2}>
+          <SQLQueryPanel onExecuteQuery={executeSqlQuery} />
         </TabPanel>
       </Container>
 
