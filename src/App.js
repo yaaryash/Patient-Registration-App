@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   CssBaseline,
@@ -6,10 +6,14 @@ import {
   Toolbar,
   Typography,
   Box,
+  Alert,
+  CircularProgress,
   Tabs,
   Tab,
+  Snackbar,
 } from "@mui/material";
 import PatientForm from "./components/PatientForm";
+import { initDb } from "./database";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -28,10 +32,46 @@ function TabPanel(props) {
 }
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState(null);
   const [tabValue, setTabValue] = useState(0);
+
+  useEffect(() => {
+    const setupDatabase = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        await initDb();
+      } catch (error) {
+        console.error("Error initializing app:", error);
+        setError(
+          "Failed to initialize the database: " +
+            (error.message || "Unknown error")
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    setupDatabase();
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handlePatientAdded = (newPatient) => {
+    setNotification("Patient registered successfully");
+
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
+
+  const handleCloseNotification = () => {
+    setNotification(null);
   };
 
   return (
@@ -59,9 +99,43 @@ function App() {
         </Box>
 
         <TabPanel value={tabValue} index={0}>
-          <PatientForm />
+          {isLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+                flexDirection: "column",
+              }}
+            >
+              <CircularProgress size={60} sx={{ mb: 3 }} />
+              <Typography variant="h6">Initializing database...</Typography>
+            </Box>
+          ) : error ? (
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <Alert severity="error">{error}</Alert>
+            </Box>
+          ) : (
+            <>
+              <PatientForm onPatientAdded={handlePatientAdded} />
+              {notification && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  {notification}
+                </Alert>
+              )}
+            </>
+          )}
         </TabPanel>
       </Container>
+
+      <Snackbar
+        open={!!notification}
+        autoHideDuration={3000}
+        onClose={handleCloseNotification}
+        message={notification}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      />
     </>
   );
 }
