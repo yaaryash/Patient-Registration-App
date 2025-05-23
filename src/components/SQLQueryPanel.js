@@ -14,6 +14,7 @@ import {
   Box,
   CircularProgress
 } from '@mui/material';
+import { isEmpty } from '../utils';
 
 const SQLQueryPanel = ({ onExecuteQuery }) => {
   const [query, setQuery] = useState('');
@@ -22,7 +23,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleExecuteQuery = async () => {
-    if (!query.trim()) {
+    if (isEmpty(query)) {
       setError('Please enter a SQL query');
       return;
     }

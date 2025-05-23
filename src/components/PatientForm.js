@@ -9,6 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { addPatient } from "../database";
+import { handleInputChange, isEmpty } from '../utils';
 
 const PatientForm = ({ onPatientAdded }) => {
   const [patient, setPatient] = useState({
@@ -22,13 +23,7 @@ const PatientForm = ({ onPatientAdded }) => {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setPatient((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const onInputChange = handleInputChange(setPatient);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,14 +31,14 @@ const PatientForm = ({ onPatientAdded }) => {
     setError(false);
     setIsLoading(true);
 
-    if (!patient.name) {
+    if (isEmpty(patient.name)) {
       setMessage("Patient name is required");
       setError(true);
       setIsLoading(false);
       return;
     }
 
-    if (!patient.purpose) {
+    if (isEmpty(patient.purpose)) {
       setMessage("Purpose of visit is required");
       setError(true);
       setIsLoading(false);
@@ -64,8 +59,6 @@ const PatientForm = ({ onPatientAdded }) => {
         phoneNumber: "",
         age: "",
       });
-
-      setMessage("Patient registered successfully!");
 
       if (onPatientAdded) onPatientAdded(newPatient);
     } catch (error) {
@@ -103,7 +96,7 @@ const PatientForm = ({ onPatientAdded }) => {
               label="Patient Name"
               name="name"
               value={patient.name}
-              onChange={handleInputChange}
+              onChange={onInputChange}
               margin="normal"
               placeholder="Enter full name"
               error={error && !patient.name}
@@ -117,7 +110,7 @@ const PatientForm = ({ onPatientAdded }) => {
               label="Purpose of Visit"
               name="purpose"
               value={patient.purpose}
-              onChange={handleInputChange}
+              onChange={onInputChange}
               margin="normal"
               placeholder="Why is the patient here?"
               multiline
@@ -132,7 +125,7 @@ const PatientForm = ({ onPatientAdded }) => {
               label="Phone Number"
               name="phoneNumber"
               value={patient.phoneNumber}
-              onChange={handleInputChange}
+              onChange={onInputChange}
               margin="normal"
               placeholder="Contact number"
               disabled={isLoading}
@@ -145,7 +138,7 @@ const PatientForm = ({ onPatientAdded }) => {
               name="age"
               type="number"
               value={patient.age}
-              onChange={handleInputChange}
+              onChange={onInputChange}
               margin="normal"
               InputProps={{ inputProps: { min: 0, max: 120 } }}
               disabled={isLoading}
