@@ -1,9 +1,15 @@
-import { PGlite } from '@electric-sql/pglite';
-import { worker } from '@electric-sql/pglite/worker';
+import { PGlite } from "@electric-sql/pglite";
+import { worker } from "@electric-sql/pglite/worker";
+import { live } from "@electric-sql/pglite/live";
 
 worker({
   async init() {
-    const db = new PGlite('idb://patient-registration-db');
+    const db = new PGlite("idb://patient-registration-db", {
+      extensions: {
+        live,
+      },
+      relaxedDurability: true,
+    });
     try {
       await db.exec(`
         CREATE TABLE IF NOT EXISTS patients (
@@ -16,9 +22,9 @@ worker({
         );
       `);
     } catch (error) {
-      console.error('PGlite worker error during table creation:', error);
+      console.error("PGlite worker error during table creation:", error);
     }
-    
+
     return db;
-  }
-}); 
+  },
+});
