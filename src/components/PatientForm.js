@@ -121,7 +121,7 @@ const PatientForm = ({ onPatientAdded }) => {
               margin="normal"
               placeholder="Why is the patient here?"
               multiline
-              rows={2}
+              rows={1}
               error={error && !patient.purpose}
               disabled={isLoading}
             />
@@ -151,7 +151,7 @@ const PatientForm = ({ onPatientAdded }) => {
               disabled={isLoading}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} pt={1}>
             <Button
               type="submit"
               variant="contained"
