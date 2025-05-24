@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from "react";
 import {
   Paper,
   Typography,
@@ -12,19 +12,19 @@ import {
   TableRow,
   Alert,
   Box,
-  CircularProgress
-} from '@mui/material';
-import { isEmpty } from '../utils';
+  CircularProgress,
+} from "@mui/material";
+import { isEmpty } from "../utils";
 
 const SQLQueryPanel = ({ onExecuteQuery }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleExecuteQuery = async () => {
+  const handleExecuteQuery = useCallback(async () => {
     if (isEmpty(query)) {
-      setError('Please enter a SQL query');
+      setError("Please enter a SQL query");
       return;
     }
 
@@ -34,12 +34,12 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
       const queryResults = await onExecuteQuery(query);
       setResults(queryResults);
     } catch (err) {
-      setError(err.message || 'Error executing query');
+      setError(err.message || "Error executing query");
       setResults(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [query, onExecuteQuery]);
 
   const renderResults = () => {
     if (!results || !results.rows || results.rows.length === 0) {
@@ -56,9 +56,9 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ backgroundColor: 'primary.light' }}>
+            <TableRow sx={{ backgroundColor: "primary.light" }}>
               {columns.map((column) => (
-                <TableCell key={column} sx={{ fontWeight: 'bold' }}>
+                <TableCell key={column} sx={{ fontWeight: "bold" }}>
                   {column}
                 </TableCell>
               ))}
@@ -69,7 +69,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
               <TableRow key={rowIndex} hover>
                 {columns.map((column) => (
                   <TableCell key={`${rowIndex}-${column}`}>
-                    {row[column] !== null ? String(row[column]) : 'NULL'}
+                    {row[column] !== null ? String(row[column]) : "NULL"}
                   </TableCell>
                 ))}
               </TableRow>
@@ -94,7 +94,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Enter your SQL query here..."
-        sx={{ mb: 2, fontFamily: 'monospace' }}
+        sx={{ mb: 2, fontFamily: "monospace" }}
       />
 
       <Button
@@ -103,11 +103,11 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
         disabled={isLoading}
         sx={{ mb: 2 }}
       >
-        {isLoading ? 'Executing...' : 'Execute Query'}
+        {isLoading ? "Executing..." : "Execute Query"}
       </Button>
 
       {isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
           <CircularProgress />
         </Box>
       )}
@@ -123,4 +123,4 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
   );
 };
 
-export default SQLQueryPanel; 
+export default SQLQueryPanel;

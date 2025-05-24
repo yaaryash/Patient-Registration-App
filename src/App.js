@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Container,
   CssBaseline,
@@ -81,38 +81,45 @@ function App() {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     setupDatabase();
   }, []);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-    if (newValue === 1) {
-      refreshPatients();
-    }
-  };
-
-  const handlePatientAdded = async (newPatient) => {
-    setNotification("Patient registered successfully");
-    await refreshPatients();
-    setTabValue(1);
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-  };
-
-  const refreshPatients = async () => {
+  const refreshPatients = useCallback(async () => {
     try {
       const updatedPatients = await getPatients();
       setPatients(updatedPatients);
     } catch (error) {
       setError("Failed to refresh patients list");
     }
-  };
+  }, []);
 
-  const handleCloseNotification = () => {
+  const handleTabChange = useCallback(
+    (event, newValue) => {
+      setTabValue(newValue);
+      if (newValue === 1) {
+        refreshPatients();
+      }
+    },
+    [refreshPatients]
+  );
+
+  const handlePatientAdded = useCallback(
+    async (newPatient) => {
+      setNotification("Patient registered successfully");
+      await refreshPatients();
+      setTabValue(1);
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    },
+    [refreshPatients]
+  );
+
+  const handleCloseNotification = useCallback(() => {
     setNotification(null);
-  };
+  }, []);
 
   return (
     <>
@@ -196,7 +203,7 @@ function App() {
 
       <Snackbar
         open={!!notification}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={handleCloseNotification}
         message={notification}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
