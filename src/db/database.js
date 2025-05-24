@@ -1,40 +1,20 @@
 import { PGliteWorker } from "@electric-sql/pglite/worker";
 import { live } from "@electric-sql/pglite/live";
+import { getIndianDateTime, formatPatientData } from "../utils/utils";
 
 let db = null;
 let initialized = false;
 let initPromise = null;
 let liveQueries = {};
 
-const getIndianDateTime = () => {
-  const now = new Date();
-  let dateTimeString = now.toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-  dateTimeString = dateTimeString.replace(/am/gi, "AM").replace(/pm/gi, "PM");
-
-  return dateTimeString;
-};
-
-const formatPatientData = (patients) => {
-  return patients.map((patient) => ({
-    ...patient,
-    phoneNumber:
-      patient.phoneNumber && patient.phoneNumber.trim() !== ""
-        ? patient.phoneNumber
-        : "-",
-    age:
-      patient.age && patient.age.toString().trim() !== "" ? patient.age : "-",
-  }));
-};
-
+/**
+ * Database module for patient registration app using PGlite worker
+ * Provides functions for database initialization, patient management, and live queries
+ */
+/**
+ * Initializes the PGlite database worker
+ * @returns {Promise<boolean>} True if initialization successful
+ */
 export const initDb = async () => {
   if (initialized) return true;
 
@@ -73,6 +53,10 @@ export const initDb = async () => {
   return initPromise;
 };
 
+/**
+ * Retrieves all patients from database ordered by creation date
+ * @returns {Promise<Array>} Array of patient objects or empty array on error
+ */
 export const getPatients = async () => {
   try {
     if (!initialized) {
@@ -91,6 +75,11 @@ export const getPatients = async () => {
   }
 };
 
+/**
+ * Adds a new patient to the database
+ * @param {Object} patient - Patient data object with name, purpose, phoneNumber, age
+ * @returns {Promise<Object>} Created patient object with generated ID and timestamp
+ */
 export const addPatient = async (patient) => {
   try {
     if (!initialized) {
@@ -141,6 +130,11 @@ export const addPatient = async (patient) => {
   }
 };
 
+/**
+ * Executes a raw SQL query on the database
+ * @param {string} sql - SQL query string to execute
+ * @returns {Promise<Object>} Query result object
+ */
 export const executeSqlQuery = async (sql) => {
   try {
     if (!initialized) {
@@ -157,6 +151,11 @@ export const executeSqlQuery = async (sql) => {
   }
 };
 
+/**
+ * Creates a live query for real-time patient updates
+ * @param {function} callback - Callback function called when data changes
+ * @returns {Promise<Object>} Live query object with queryId
+ */
 export const createLivePatientQuery = async (callback) => {
   try {
     if (!initialized) {

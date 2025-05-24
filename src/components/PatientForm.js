@@ -12,6 +12,11 @@ import {
 import { addPatient } from "../db/database";
 import { handleInputChange, isEmpty } from "../utils/utils";
 
+/**
+ * PatientForm component for registering new patients
+ * @param {function} [onPatientAdded] - Callback function called when patient is successfully added
+ * @returns {JSX.Element} Patient registration form with validation and loading states
+ */
 const PatientForm = ({ onPatientAdded }) => {
   const [patient, setPatient] = useState({
     name: "",

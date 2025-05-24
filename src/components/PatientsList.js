@@ -2,6 +2,11 @@ import { Paper, Typography, Box, Chip, Alert } from "@mui/material";
 import PropTypes from "prop-types";
 import CommonTable from "../common/CommonTable";
 
+/**
+ * PatientsList component for displaying registered patients in a table
+ * @param {Array} patients - Array of patient objects to display
+ * @returns {JSX.Element} Table view of patients with count chip and error handling
+ */
 const PatientsList = ({ patients }) => {
   if (!patients) {
     return (

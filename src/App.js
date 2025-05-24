@@ -23,6 +23,20 @@ import {
   createLivePatientQuery,
 } from "./db/database";
 
+/**
+ * Main App component for MediLite
+ * Manages database initialization, patient data state, and tab navigation
+ * Features live query updates and notification system
+ */
+
+/**
+ * TabPanel component for rendering tab content
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Tab content
+ * @param {number} props.value - Current active tab index
+ * @param {number} props.index - This tab's index
+ * @returns {JSX.Element} Tab panel with conditional rendering
+ */
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -45,6 +59,10 @@ TabPanel.propTypes = {
   index: PropTypes.number.isRequired,
 };
 
+/**
+ * Main application component with tabbed interface
+ * @returns {JSX.Element} Complete patient registration application
+ */
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -133,9 +151,21 @@ function App() {
       <CssBaseline />
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Patient Registration System
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+            <img
+              src="/Logo.jpeg"
+              alt="MediLite Logo"
+              style={{
+                height: "40px",
+                width: "40px",
+                marginRight: "12px",
+                borderRadius: "4px",
+              }}
+            />
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              MediLite
+            </Typography>
+          </Box>
         </Toolbar>
       </AppBar>
 

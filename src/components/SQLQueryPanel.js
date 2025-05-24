@@ -17,6 +17,11 @@ import {
 } from "@mui/material";
 import { isEmpty } from "../utils/utils";
 
+/**
+ * SQLQueryPanel component for executing SQL queries and displaying results
+ * @param {function} onExecuteQuery - Function to execute SQL queries, receives query string as parameter
+ * @returns {JSX.Element} SQL editor with query input, execute button, and results table
+ */
 const SQLQueryPanel = ({ onExecuteQuery }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
@@ -53,8 +58,8 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
     }
 
     return column
-      .replace(/([A-Z])/g, " $1") 
-      .replace(/_/g, " ") 
+      .replace(/([A-Z])/g, " $1")
+      .replace(/_/g, " ")
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ")
