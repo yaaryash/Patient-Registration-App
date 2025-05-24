@@ -14,6 +14,8 @@ import {
   Alert,
   Box,
   CircularProgress,
+  Chip,
+  Stack,
 } from "@mui/material";
 import { isEmpty } from "../utils/utils";
 
@@ -27,6 +29,13 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const exampleQueries = [
+    "SELECT * FROM patients",
+    "SELECT name, age FROM patients WHERE age > 30",
+    "SELECT name, phoneNumber FROM patients ORDER BY name",
+    "SELECT COUNT(*) as total_patients FROM patients",
+  ];
 
   const handleExecuteQuery = useCallback(async () => {
     if (isEmpty(query)) {
@@ -46,6 +55,11 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
       setIsLoading(false);
     }
   }, [query, onExecuteQuery]);
+
+  const handleExampleClick = (exampleQuery) => {
+    setQuery(exampleQuery);
+    setError(null);
+  };
 
   const formatColumnHeader = (column) => {
     const lowerColumn = column.toLowerCase();
@@ -91,7 +105,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
     if (!results || !results.rows || results.rows.length === 0) {
       return (
         <Typography color="textSecondary" sx={{ mt: 2 }}>
-          No results to display
+          Your query executed successfully but returned no matching records.
         </Typography>
       );
     }
@@ -132,6 +146,38 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
         SQL Query Editor
       </Typography>
 
+      <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+        Use the table name <strong>"patients"</strong> in your queries. Click on
+        any example below to get started:
+      </Typography>
+
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+          Example Queries:
+        </Typography>
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          {exampleQueries.map((example, index) => (
+            <Chip
+              key={index}
+              label={example}
+              variant="outlined"
+              clickable
+              onClick={() => handleExampleClick(example)}
+              sx={{
+                mb: 1,
+                fontFamily: "monospace",
+                fontSize: "0.75rem",
+                "&:hover": {
+                  backgroundColor: "rgba(25, 118, 210, 0.08)",
+                  borderColor: "primary.main",
+                  color: "primary.main",
+                },
+              }}
+            />
+          ))}
+        </Stack>
+      </Box>
+
       <TextField
         fullWidth
         multiline
@@ -139,7 +185,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
         variant="outlined"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Enter your SQL query here..."
+        placeholder="Enter your SQL query here... (e.g., SELECT * FROM patients)"
         sx={{ mb: 2, fontFamily: "monospace" }}
       />
 
