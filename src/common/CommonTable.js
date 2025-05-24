@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from "prop-types";
 import {
   Table,
   TableBody,
@@ -6,8 +6,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
-} from '@mui/material';
+  Paper,
+} from "@mui/material";
 
 /**
  * CommonTable component for rendering tabular data
@@ -20,22 +20,23 @@ const CommonTable = ({ data, columns }) => {
   }
 
   const getValue = (row, col) => {
-    if (row[col.key] !== undefined && row[col.key] !== null) return row[col.key];
+    if (row[col.key] !== undefined && row[col.key] !== null)
+      return row[col.key];
     if (col.altKeys) {
       for (const alt of col.altKeys) {
         if (row[alt] !== undefined && row[alt] !== null) return row[alt];
       }
     }
-    return 'N/A';
+    return "N/A";
   };
 
   return (
     <TableContainer component={Paper}>
       <Table size="small">
         <TableHead>
-          <TableRow sx={{ backgroundColor: 'primary.light' }}>
+          <TableRow sx={{ backgroundColor: "primary.light" }}>
             {columns.map((col) => (
-              <TableCell key={col.key} sx={{ fontWeight: 'bold' }}>
+              <TableCell key={col.key} sx={{ fontWeight: "bold" }}>
                 {col.label}
               </TableCell>
             ))}
@@ -45,9 +46,7 @@ const CommonTable = ({ data, columns }) => {
           {data.map((row, rowIndex) => (
             <TableRow key={row.id || rowIndex} hover>
               {columns.map((col) => (
-                <TableCell key={col.key}>
-                  {getValue(row, col)}
-                </TableCell>
+                <TableCell key={col.key}>{getValue(row, col)}</TableCell>
               ))}
             </TableRow>
           ))}
@@ -57,4 +56,15 @@ const CommonTable = ({ data, columns }) => {
   );
 };
 
-export default CommonTable; 
+CommonTable.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      key: PropTypes.string.isRequired,
+      altKeys: PropTypes.arrayOf(PropTypes.string),
+    })
+  ).isRequired,
+};
+
+export default CommonTable;

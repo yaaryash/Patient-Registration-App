@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
+import PropTypes from "prop-types";
 import {
   Box,
   Button,
@@ -218,6 +219,14 @@ const PatientForm = ({ onPatientAdded }) => {
       </Box>
     </Paper>
   );
+};
+
+PatientForm.propTypes = {
+  onPatientAdded: PropTypes.func,
+};
+
+PatientForm.defaultProps = {
+  onPatientAdded: null,
 };
 
 PatientForm.displayName = "PatientForm";

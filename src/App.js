@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import PropTypes from "prop-types";
 import {
   Container,
   CssBaseline,
@@ -37,6 +38,12 @@ function TabPanel(props) {
     </div>
   );
 }
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  value: PropTypes.number.isRequired,
+  index: PropTypes.number.isRequired,
+};
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);

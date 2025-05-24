@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import PropTypes from "prop-types";
 import {
   Paper,
   Typography,
@@ -161,6 +162,10 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
       {results && renderResults()}
     </Paper>
   );
+};
+
+SQLQueryPanel.propTypes = {
+  onExecuteQuery: PropTypes.func.isRequired,
 };
 
 export default SQLQueryPanel;
