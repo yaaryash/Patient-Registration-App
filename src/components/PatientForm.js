@@ -129,7 +129,6 @@ const PatientForm = ({ onPatientAdded }) => {
       onChange: onInputChange,
       margin: "normal",
       placeholder: "Why is the patient here?",
-      multiline: true,
       rows: 1,
       error: error && !patient.purpose,
       disabled: isLoading,
