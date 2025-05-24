@@ -8,8 +8,8 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { addPatient } from "../database";
-import { handleInputChange, isEmpty } from "../utils";
+import { addPatient } from "../db/database";
+import { handleInputChange, isEmpty } from "../utils/utils";
 
 const PatientForm = ({ onPatientAdded }) => {
   const [patient, setPatient] = useState({

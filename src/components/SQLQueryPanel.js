@@ -14,7 +14,7 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { isEmpty } from "../utils";
+import { isEmpty } from "../utils/utils";
 
 const SQLQueryPanel = ({ onExecuteQuery }) => {
   const [query, setQuery] = useState("");
@@ -41,6 +41,46 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
     }
   }, [query, onExecuteQuery]);
 
+  const formatColumnHeader = (column) => {
+    const lowerColumn = column.toLowerCase();
+
+    if (lowerColumn === "phonenumber" || lowerColumn === "phone_number") {
+      return "Phone";
+    }
+    if (lowerColumn === "createdat" || lowerColumn === "created_at") {
+      return "Registered On";
+    }
+
+    return column
+      .replace(/([A-Z])/g, " $1") 
+      .replace(/_/g, " ") 
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ")
+      .trim();
+  };
+
+  const formatCellValue = (value, columnName) => {
+    if (value === null || value === undefined) {
+      const lowerColumn = columnName.toLowerCase();
+
+      if (
+        lowerColumn === "phone" ||
+        lowerColumn === "phonenumber" ||
+        lowerColumn === "phone_number" ||
+        lowerColumn === "age"
+      ) {
+        return "-";
+      }
+
+      return "NULL";
+    }
+
+    const stringValue = String(value);
+
+    return stringValue.charAt(0).toUpperCase() + stringValue.slice(1);
+  };
+
   const renderResults = () => {
     if (!results || !results.rows || results.rows.length === 0) {
       return (
@@ -59,7 +99,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
             <TableRow sx={{ backgroundColor: "primary.light" }}>
               {columns.map((column) => (
                 <TableCell key={column} sx={{ fontWeight: "bold" }}>
-                  {column}
+                  {formatColumnHeader(column)}
                 </TableCell>
               ))}
             </TableRow>
@@ -69,7 +109,7 @@ const SQLQueryPanel = ({ onExecuteQuery }) => {
               <TableRow key={rowIndex} hover>
                 {columns.map((column) => (
                   <TableCell key={`${rowIndex}-${column}`}>
-                    {row[column] !== null ? String(row[column]) : "NULL"}
+                    {formatCellValue(row[column], column)}
                   </TableCell>
                 ))}
               </TableRow>

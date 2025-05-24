@@ -20,7 +20,7 @@ import {
   getPatients,
   executeSqlQuery,
   createLivePatientQuery,
-} from "./database";
+} from "./db/database";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

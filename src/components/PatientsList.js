@@ -6,7 +6,7 @@ import {
   Chip,
   Alert
 } from '@mui/material';
-import CommonTable from './CommonTable';
+import CommonTable from '../common/CommonTable';
 
 const PatientsList = ({ patients }) => {
   useEffect(() => {
